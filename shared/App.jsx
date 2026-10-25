@@ -6,6 +6,8 @@ import { Icon, Brand } from './ui/index.jsx';
 import * as E from './views/employee.jsx';
 import * as L from './views/leadership.jsx';
 import * as A from './views/admin.jsx';
+import * as H from './views/hr.jsx';
+import * as M from './views/manager.jsx';
 import './base.css';
 
 /* Hook used by every variant's Shell: gives nav groups, current page meta, role switching, theme. */
@@ -45,7 +47,8 @@ function Login() {
 function Guard({ Shell }) {
   const { role, toast } = useStore(); const loc = useLocation();
   if (!role) return <Navigate to="/login" replace />;
-  const ok = role === 'admin' ? loc.pathname.startsWith('/admin') : role === 'leadership' ? /^\/(uer|lead)\//.test(loc.pathname) : loc.pathname.startsWith('/uer/');
+  const prefix = { admin: /^\/admin\//, leadership: /^\/(uer|lead)\//, hr: /^\/(uer|hr)\//, manager: /^\/(uer|mgr)\//, employee: /^\/uer\// }[role];
+  const ok = prefix.test(loc.pathname);
   if (!ok) return <Navigate to="/" replace />;
   return <><Shell><Outlet /></Shell>{toast && <div className="toast"><Icon name="check" size={16} />{toast}</div>}</>;
 }
@@ -58,6 +61,8 @@ function Home() {
 const ROUTES = [
   ['uer/dashboard', E.Dashboard], ['uer/goals', E.Goals], ['uer/tasks', E.Tasks], ['uer/leave', E.Leave], ['uer/policies', E.Policies],
   ['uer/appraisal', E.Appraisal], ['uer/feedback', E.Feedback], ['uer/hub', E.Hub], ['uer/cxo', E.Cxo],
+  ['mgr/dashboard', M.Dashboard], ['mgr/team', M.Team], ['mgr/goals', M.Goals], ['mgr/approvals', M.Approvals], ['mgr/appraisals', M.Appraisals],
+  ['hr/dashboard', H.Dashboard], ['hr/employees', H.Employees], ['hr/leave', H.LeaveApprovals], ['hr/appraisals', H.Appraisals], ['hr/recruitment', H.Recruitment], ['hr/policies', H.Policies], ['hr/disputes', L.Disputes],
   ['lead/overview', L.Overview], ['lead/team', L.Team], ['lead/reports', L.Reports], ['lead/registry', L.Registry], ['lead/records', L.Records], ['lead/disputes', L.Disputes], ['lead/sublogins', L.Sublogins],
   ['admin/dashboard', A.Dashboard], ['admin/companies', A.Companies], ['admin/colleges', A.Colleges], ['admin/users', A.Users], ['admin/verification', A.Verification], ['admin/analytics', A.Analytics], ['admin/revenue', A.Revenue], ['admin/settings', A.Settings],
 ];

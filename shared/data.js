@@ -1,5 +1,9 @@
 /* Mock data. Everything lives in memory; reloading the page resets it. */
+import { extraData } from './extra.js';
+
 export const USERS = {
+  hr: { name: 'Rohit Gupta', title: 'HR Business Partner', dept: 'People', company: 'Acme Corp', role: 'hr' },
+  manager: { name: 'Priya Menon', title: 'Engineering Manager', dept: 'Engineering', company: 'Acme Corp', role: 'manager' },
   employee: { name: 'Arjun Sharma', title: 'Senior Engineer', dept: 'Engineering', company: 'Acme Corp', role: 'employee' },
   leadership: { name: 'Kavitha Rao', title: 'Chief People Officer', dept: 'Leadership', company: 'Acme Corp', role: 'leadership' },
   admin: { name: 'Platform Admin', title: 'Super Admin', dept: 'Platform', company: 'Karyam', role: 'super_admin' },
@@ -7,6 +11,8 @@ export const USERS = {
 
 export const ROLES = [
   { id: 'employee', label: 'Employee', desc: 'Goals, tasks, leave, appraisal, feedback and company hub.', icon: 'user', home: '/uer/dashboard' },
+  { id: 'manager', label: 'Manager', desc: 'Team goals, task ratings, leave approvals and appraisal ratings.', icon: 'users', home: '/mgr/dashboard' },
+  { id: 'hr', label: 'HR', desc: 'Employees, leave, appraisal tracking, recruitment and policies.', icon: 'id', home: '/hr/dashboard' },
   { id: 'leadership', label: 'Leadership', desc: 'Executive overview, team performance, reports and records.', icon: 'award', home: '/lead/overview' },
   { id: 'admin', label: 'Super Admin', desc: 'Companies, colleges, users, verification, revenue, settings.', icon: 'shield', home: '/admin/dashboard' },
 ];
@@ -21,6 +27,22 @@ const EMP = [
   { id: 'feedback', label: '360 Feedback', icon: 'message', title: '360° Feedback', sub: 'What peers and managers say about you' },
   { id: 'hub', label: 'Company Hub', icon: 'users', title: 'Company Hub', sub: 'Team, news and gallery' },
   { id: 'cxo', label: 'CXO Connect', icon: 'send', title: 'CXO Connect', sub: 'Talk directly to leadership' },
+];
+const MGR = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'grid', title: 'Manager Dashboard', sub: 'Your team at a glance' },
+  { id: 'team', label: 'My Team', icon: 'users', title: 'My Team', sub: 'Direct reports and ratings' },
+  { id: 'goals', label: 'Goals & Tasks', icon: 'target', title: 'Goals & Tasks', sub: 'Create goals, assign tasks and rate them' },
+  { id: 'approvals', label: 'Approvals', icon: 'calendar', title: 'Approvals', sub: 'Team leave and WFH requests' },
+  { id: 'appraisals', label: 'Team Appraisals', icon: 'award', title: 'Team Appraisals', sub: 'Rate submitted self-appraisals' },
+];
+const HR = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'grid', title: 'HR Dashboard', sub: 'People operations overview' },
+  { id: 'employees', label: 'Employees', icon: 'users', title: 'Employees', sub: 'Directory and onboarding' },
+  { id: 'leave', label: 'Leave Approvals', icon: 'calendar', title: 'Leave Approvals', sub: 'HR-stage approvals for leave and WFH' },
+  { id: 'appraisals', label: 'Appraisal Tracker', icon: 'award', title: 'Appraisal Tracker', sub: 'Monthly, quarterly and annual cycles' },
+  { id: 'recruitment', label: 'Recruitment', icon: 'briefcase', title: 'Recruitment', sub: 'Openings and candidate pipeline' },
+  { id: 'policies', label: 'Policies', icon: 'shield', title: 'Policies', sub: 'Publish and track acknowledgement' },
+  { id: 'disputes', label: 'Disputes', icon: 'alert', title: 'Disputes', sub: 'Review and resolve employee disputes' },
 ];
 const LEAD = [
   { id: 'overview', label: 'Executive Overview', icon: 'chart', title: 'Executive Overview', sub: 'Organisation-wide performance and risk', base: '/lead' },
@@ -45,6 +67,14 @@ const ADM = [
 export function navFor(role) {
   const emp = EMP.map(n => ({ ...n, to: '/uer/' + n.id }));
   if (role === 'employee') return [{ group: 'Workspace', items: emp }];
+  if (role === 'manager') return [
+    { group: 'Management', items: MGR.map(n => ({ ...n, to: '/mgr/' + n.id })) },
+    { group: 'My workspace', items: emp },
+  ];
+  if (role === 'hr') return [
+    { group: 'People ops', items: HR.map(n => ({ ...n, to: '/hr/' + n.id })) },
+    { group: 'My workspace', items: emp },
+  ];
   if (role === 'leadership') return [
     { group: 'Executive', items: LEAD.map(n => ({ ...n, to: '/lead/' + n.id })) },
     { group: 'My workspace', items: emp },
@@ -55,6 +85,7 @@ export function navFor(role) {
 export const flatNav = role => navFor(role).flatMap(g => g.items);
 
 export const initialData = () => ({
+  ...extraData(),
   goals: [
     { id: 1, title: 'Reduce API latency by 30%', category: 'Technical', priority: 'High', weight: 30, progress: 72, status: 'Approved', fy: 'FY 2025-26', rating: 4.5 },
     { id: 2, title: 'Mentor two junior engineers', category: 'People', priority: 'Medium', weight: 15, progress: 55, status: 'Approved', fy: 'FY 2025-26', rating: 0 },

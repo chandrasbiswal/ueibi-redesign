@@ -1,6 +1,6 @@
 # UEIBI / Karyam UI Redesign
 
-Three corporate redesigns of the full workable UI (Employee, Leadership, Super Admin portals), built with React 19 + Vite. All data is mock and in-memory: you can add, edit and delete items, and everything resets on reload. The chosen role and theme persist in localStorage.
+Three corporate redesigns of the full workable UI (Employee, Manager, HR, Leadership and Super Admin portals), built with React 19 + Vite. All data is mock and in-memory: you can add, edit and delete items, and everything resets on reload. The chosen role and theme persist in localStorage.
 
 | Variant | Folder | Look | Dev port |
 |---|---|---|---|
@@ -26,4 +26,5 @@ npm run build   # outputs dist/a-horizon, dist/b-meridian, dist/c-nocturne
 
 - `shared/`: components (`ui/`), screens (`views/`), mock data, store, routes and the base styles. They are driven by CSS variables.
 - `variants/<x>/`: only a `Shell.jsx` (layout), `theme.css` (tokens and overrides) and `main.jsx`.
-- Roles: Employee (`/uer/*`), Leadership (`/lead/*`), Super Admin (`/admin/*`). Switch roles from the account menu.
+- Roles: Employee (`/uer/*`), Manager (`/mgr/*`), HR (`/hr/*`), Leadership (`/lead/*`), Super Admin (`/admin/*`). Manager, HR and Leadership also get the employee workspace.
+- HR appraisal tracker: monthly and quarterly cycles show who has submitted, with HR review and remarks only. The annual cycle adds the final audit, hike % and result release. Switch roles from the account menu.
