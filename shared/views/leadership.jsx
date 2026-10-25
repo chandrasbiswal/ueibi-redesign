@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store.jsx';
 import { Icon, Avatar, Badge, Status, Progress, Tabs, Card, Stat, Empty, FormModal, Ring, LineChart, BarChart, Donut, SearchBox, Toggle, Stars } from '../ui/index.jsx';
 import { CHART } from '../data.js';
+import { Profile } from './profile.jsx';
 
 export function Overview() {
   const { data } = useStore();
@@ -30,23 +31,31 @@ export function Overview() {
 }
 
 export function Team() {
-  const { data, add } = useStore();
-  const [q, setQ] = useState(''); const [dept, setDept] = useState('All'); const [open, setOpen] = useState(false);
-  const depts = ['All', ...new Set(data.team.map(t => t.dept))];
-  const list = data.team.filter(t => (dept === 'All' || t.dept === dept) && (t.name + t.title + t.email).toLowerCase().includes(q.toLowerCase()));
+  const { data, add, notify } = useStore();
+  const [q, setQ] = useState(''); const [fy, setFy] = useState('FY 2025-26'); const [dept, setDept] = useState('All'); const [skill, setSkill] = useState('All'); const [grade, setGrade] = useState('All'); const [min, setMin] = useState('All');
+  const [open, setOpen] = useState(false); const [who, setWho] = useState(null);
+  const opt = k => ['All', ...new Set(data.team.map(t => t[k]))];
+  const skills = ['All', ...new Set(data.team.flatMap(t => (t.skills || '').split(',').map(x => x.trim()).filter(Boolean)))];
+  const list = data.team.filter(t => (dept === 'All' || t.dept === dept) && (grade === 'All' || t.grade === grade) && (skill === 'All' || (t.skills || '').includes(skill)) && (min === 'All' || t.rating >= Number(min)) && (t.name + t.title + t.skills).toLowerCase().includes(q.toLowerCase()));
+  const active = data.team.filter(t => t.status === 'Active');
+  const sel = (label, v, set, opts) => <label className="fl"><span>{label}</span><select className="input sm" value={v} onChange={e => set(e.target.value)}>{opts.map(x => <option key={x}>{x}</option>)}</select></label>;
   return (
     <div className="page">
       <div className="grid g4">
-        <Stat icon="users" label="Total people" value={data.team.length} /><Stat icon="star" tone="ok" label="Avg rating" value={(data.team.reduce((a, t) => a + t.rating, 0) / data.team.length).toFixed(1)} />
-        <Stat icon="briefcase" tone="info" label="Contractors" value={data.team.filter(t => t.type === 'Contract').length} /><Stat icon="alert" tone="warn" label="On notice" value={data.team.filter(t => t.status === 'On notice').length} />
+        <Stat icon="users" label="Total directs" value={active.length} /><Stat icon="trendUp" tone="ok" label="Avg performance" value={(data.team.reduce((a, t) => a + t.rating, 0) / data.team.length).toFixed(2)} />
+        <Stat icon="star" tone="warn" label="Top performers (≥ 4.2)" value={data.team.filter(t => t.rating >= 4.2).length} /><Stat icon="clock" tone="bad" label="Pending appraisals" value={data.hrAppr.filter(a => a.status === 'Submitted').length} />
       </div>
-      <div className="toolbar"><SearchBox value={q} onChange={setQ} placeholder="Search name, title or email" /><select className="input sm" value={dept} onChange={e => setDept(e.target.value)}>{depts.map(d => <option key={d}>{d}</option>)}</select><span className="grow" />
-        <button className="btn pri" onClick={() => setOpen(true)}><Icon name="plus" size={16} />Add member</button></div>
-      <Card pad={false}><div className="table-wrap"><table className="tbl"><thead><tr><th>Employee</th><th>Department</th><th>Grade</th><th>Type</th><th>Rating</th><th>Status</th></tr></thead>
-        <tbody>{list.map(t => <tr key={t.id}><td><div className="who"><Avatar name={t.name} /><div><b>{t.name}</b><small>{t.title}</small></div></div></td><td>{t.dept}</td><td>{t.grade}</td><td>{t.type}</td><td><Stars value={t.rating} /></td><td><Status value={t.status} /></td></tr>)}</tbody></table>{!list.length && <Empty text="No matching people." />}</div></Card>
+      <Card><div className="filters">
+        <label className="fl grow"><span>Search</span><SearchBox value={q} onChange={setQ} placeholder="Search by name, designation or skill…" /></label>
+        {sel('Financial year', fy, setFy, ['FY 2026-27', 'FY 2025-26', 'FY 2024-25'])}{sel('Department', dept, setDept, opt('dept'))}{sel('Key skill', skill, setSkill, skills)}{sel('Grade / band', grade, setGrade, opt('grade'))}{sel('Min rating', min, setMin, ['All', '3', '3.5', '4', '4.5'])}
+        <button className="btn pri" onClick={() => setOpen(true)}><Icon name="plus" size={16} />Add member</button></div></Card>
+      <Card pad={false}><div className="table-wrap"><table className="tbl"><thead><tr><th>Team member</th><th>Grade / band</th><th>Employee type</th><th>Overall rating</th><th>Joining date</th><th>Status</th><th /></tr></thead>
+        <tbody>{list.map(t => <tr key={t.id} className="clickable" onClick={() => setWho(t)}><td><div className="who"><Avatar name={t.name} /><div><b>{t.name}</b><small>{t.title}</small></div></div></td><td><Badge>{t.grade}</Badge></td><td>{t.type}</td><td><Stars value={t.rating} /></td><td>{t.joined}</td><td><Status value={t.status} /></td>
+          <td className="right"><button className="btn sm" onClick={e => { e.stopPropagation(); setWho(t); }}><Icon name="eye" size={14} />View profile</button></td></tr>)}</tbody></table>{!list.length && <Empty text="No matching people." />}</div></Card>
+      {who && <Profile person={who} onClose={() => setWho(null)} />}
       {open && <FormModal title="Add team member" submitLabel="Add" onClose={() => setOpen(false)}
-        fields={[{ name: 'name', label: 'Full name', required: true }, { name: 'title', label: 'Title', required: true }, { name: 'dept', label: 'Department', type: 'select', options: ['Engineering', 'Design', 'People', 'Sales', 'Analytics'] }, { name: 'email', label: 'Email', type: 'email' }, { name: 'grade', label: 'Grade' }, { name: 'type', label: 'Type', type: 'select', options: ['Full-time', 'Contract'] }]}
-        onSubmit={v => add('team', { ...v, rating: 0, status: 'Active' })} />}
+        fields={[{ name: 'name', label: 'Full name', required: true }, { name: 'title', label: 'Title', required: true }, { name: 'dept', label: 'Department', type: 'select', options: ['Engineering', 'Design', 'People', 'Sales', 'Analytics'] }, { name: 'email', label: 'Email', type: 'email' }, { name: 'grade', label: 'Grade', placeholder: 'L3' }, { name: 'type', label: 'Type', type: 'select', options: ['Permanent', 'Contractual'] }, { name: 'joined', label: 'Joining date', type: 'date' }, { name: 'skills', label: 'Key skills', placeholder: 'React, SQL' }]}
+        onSubmit={v => { add('team', { ...v, rating: 0, status: 'Active', manager: 'Kavitha Rao', location: 'Mumbai' }); notify('Member added'); }} />}
     </div>
   );
 }

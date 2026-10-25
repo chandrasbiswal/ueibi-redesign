@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store.jsx';
 import { Icon, Avatar, Badge, Status, Progress, Tabs, Card, Stat, Empty, FormModal, Modal, Ring, LineChart, Stars } from '../ui/index.jsx';
 import { CHART } from '../data.js';
+import { GoalList, TaskBoard } from './goals.jsx';
 
 const PRI = { High: 'bad', Medium: 'warn', Low: 'mute' };
 
@@ -56,103 +57,8 @@ export function Dashboard() {
   );
 }
 
-export function Goals() {
-  const { data, add, patch, del, notify } = useStore();
-  const [fy, setFy] = useState('All'); const [cat, setCat] = useState('All'); const [st, setSt] = useState('All');
-  const [open, setOpen] = useState(false); const [edit, setEdit] = useState(null);
-  const list = data.goals.filter(g => (fy === 'All' || g.fy === fy) && (cat === 'All' || g.category === cat) && (st === 'All' || g.status === st));
-  const fields = [
-    { name: 'title', label: 'Goal title', required: true, full: true },
-    { name: 'category', label: 'Category', type: 'select', options: ['Technical', 'People', 'Product', 'Culture', 'Finance'] },
-    { name: 'priority', label: 'Priority', type: 'select', options: ['High', 'Medium', 'Low'] },
-    { name: 'weight', label: 'Weightage %', type: 'number' },
-    { name: 'fy', label: 'Financial year', type: 'select', options: ['FY 2025-26', 'FY 2024-25'] },
-  ];
-  return (
-    <div className="page">
-      <div className="toolbar">
-        <select className="input sm" value={fy} onChange={e => setFy(e.target.value)}>{['All', 'FY 2025-26', 'FY 2024-25'].map(x => <option key={x}>{x}</option>)}</select>
-        <select className="input sm" value={cat} onChange={e => setCat(e.target.value)}>{['All', 'Technical', 'People', 'Product', 'Culture', 'Finance'].map(x => <option key={x}>{x}</option>)}</select>
-        <select className="input sm" value={st} onChange={e => setSt(e.target.value)}>{['All', 'Draft', 'Approved', 'Completed', 'Archived'].map(x => <option key={x}>{x}</option>)}</select>
-        <span className="grow" />
-        <button className="btn pri" onClick={() => setOpen(true)}><Icon name="plus" size={16} />Create new goal</button>
-      </div>
-      {list.length === 0 ? <Empty text="No goals match these filters." /> : (
-        <div className="grid g3">
-          {list.map(g => (
-            <article key={g.id} className="card goal">
-              <div className="goal-top"><Badge tone="pri">{g.category}</Badge><Status value={g.status} /></div>
-              <h4>{g.title}</h4>
-              <div className="meta"><span>{g.fy}</span><span>Weight {g.weight}%</span><Badge tone={PRI[g.priority]}>{g.priority}</Badge></div>
-              <div className="prog-row"><Progress value={g.progress} tone={g.progress >= 100 ? 'ok' : ''} /><b>{g.progress}%</b></div>
-              <div className="goal-foot">
-                {g.rating ? <Stars value={g.rating} /> : <small className="muted">Not rated yet</small>}
-                <span className="grow" />
-                {g.status === 'Draft' && <button className="btn sm" onClick={() => { patch('goals', g.id, { status: 'Approved' }); notify('Goal submitted & approved'); }}>Submit</button>}
-                {g.status === 'Approved' && g.progress < 100 && <button className="btn sm" onClick={() => patch('goals', g.id, { progress: Math.min(100, g.progress + 10) })}>+10%</button>}
-                <button className="icon-btn" aria-label="Edit" onClick={() => setEdit(g)}><Icon name="edit" size={15} /></button>
-                <button className="icon-btn" aria-label="Delete" onClick={() => del('goals', g.id)}><Icon name="trash" size={15} /></button>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-      {open && <FormModal title="Create new goal" fields={fields} submitLabel="Create goal" onClose={() => setOpen(false)} onSubmit={v => { add('goals', { ...v, progress: 0, status: 'Draft', rating: 0 }); notify('Goal created'); }} />}
-      {edit && <FormModal title="Edit goal" fields={fields} initial={edit} onClose={() => setEdit(null)} onSubmit={v => patch('goals', edit.id, v)} />}
-    </div>
-  );
-}
-
-const COLS = [['assigned', 'Assigned'], ['progress', 'In progress'], ['hold', 'Pending on others'], ['review', 'In review'], ['done', 'Done']];
-export function Tasks() {
-  const { data, add, patch, del } = useStore();
-  const [view, setView] = useState('board'); const [open, setOpen] = useState(false); const [drag, setDrag] = useState(null);
-  const fields = [
-    { name: 'title', label: 'Task', required: true, full: true },
-    { name: 'goal', label: 'Linked goal', type: 'select', options: data.goals.map(g => g.title) },
-    { name: 'priority', label: 'Priority', type: 'select', options: ['High', 'Medium', 'Low'] },
-    { name: 'due', label: 'Due', placeholder: 'e.g. Fri' },
-  ];
-  const move = (t, dir) => { const i = COLS.findIndex(c => c[0] === t.col) + dir; if (COLS[i]) patch('tasks', t.id, { col: COLS[i][0] }); };
-  return (
-    <div className="page">
-      <div className="toolbar">
-        <Tabs tabs={[{ id: 'board', label: 'Board' }, { id: 'list', label: 'List' }]} value={view} onChange={setView} />
-        <span className="grow" />
-        <button className="btn pri" onClick={() => setOpen(true)}><Icon name="plus" size={16} />New task</button>
-      </div>
-      {view === 'board' ? (
-        <div className="kanban">
-          {COLS.map(([id, label]) => {
-            const items = data.tasks.filter(t => t.col === id);
-            return (
-              <div key={id} className="kcol" onDragOver={e => e.preventDefault()} onDrop={() => { if (drag) patch('tasks', drag, { col: id }); setDrag(null); }}>
-                <header><b>{label}</b><span className="count">{items.length}</span></header>
-                {items.map(t => (
-                  <div key={t.id} className="kcard" draggable onDragStart={() => setDrag(t.id)}>
-                    <div className="kc-top"><Badge tone={PRI[t.priority]}>{t.priority}</Badge><small>{t.due}</small></div>
-                    <b>{t.title}</b><small className="muted">{t.goal}</small>
-                    <div className="kc-actions">
-                      <button className="icon-btn" disabled={id === COLS[0][0]} onClick={() => move(t, -1)} aria-label="Move back"><Icon name="chevL" size={14} /></button>
-                      <button className="icon-btn" disabled={id === 'done'} onClick={() => move(t, 1)} aria-label="Move forward"><Icon name="chevR" size={14} /></button>
-                      <button className="icon-btn" onClick={() => del('tasks', t.id)} aria-label="Delete"><Icon name="trash" size={14} /></button>
-                    </div>
-                  </div>
-                ))}
-                {!items.length && <div className="kempty">Drop tasks here</div>}
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <Card pad={false}><div className="table-wrap"><table className="tbl"><thead><tr><th>Task</th><th>Goal</th><th>Priority</th><th>Due</th><th>Stage</th></tr></thead>
-          <tbody>{data.tasks.map(t => <tr key={t.id}><td><b>{t.title}</b></td><td>{t.goal}</td><td><Badge tone={PRI[t.priority]}>{t.priority}</Badge></td><td>{t.due}</td>
-            <td><select className="input sm" value={t.col} onChange={e => patch('tasks', t.id, { col: e.target.value })}>{COLS.map(c => <option key={c[0]} value={c[0]}>{c[1]}</option>)}</select></td></tr>)}</tbody></table></div></Card>
-      )}
-      {open && <FormModal title="New task" fields={fields} submitLabel="Add task" onClose={() => setOpen(false)} onSubmit={v => add('tasks', { ...v, col: 'assigned' })} />}
-    </div>
-  );
-}
+export const Goals = () => <GoalList />;
+export const Tasks = TaskBoard;
 
 export function Leave() {
   const { data, add, notify } = useStore();

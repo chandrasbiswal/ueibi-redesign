@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store.jsx';
 import { Icon, Avatar, Badge, Status, Progress, Tabs, Card, Stat, Empty, FormModal, Modal, Donut, BarChart, SearchBox, Stars } from '../ui/index.jsx';
 import { CHART } from '../data.js';
+import { Profile } from './profile.jsx';
 
 export function Dashboard() {
   const { data } = useStore();
@@ -26,16 +27,17 @@ export function Dashboard() {
 
 export function Employees() {
   const { data, add, del, notify } = useStore();
-  const [q, setQ] = useState(''); const [open, setOpen] = useState(false);
+  const [q, setQ] = useState(''); const [open, setOpen] = useState(false); const [who, setWho] = useState(null);
   const list = data.team.filter(t => (t.name + t.title + t.dept).toLowerCase().includes(q.toLowerCase()));
   return (
     <div className="page">
       <div className="toolbar"><SearchBox value={q} onChange={setQ} placeholder="Search employees" /><span className="grow" /><button className="btn pri" onClick={() => setOpen(true)}><Icon name="plus" size={16} />Onboard employee</button></div>
       <Card pad={false}><div className="table-wrap"><table className="tbl"><thead><tr><th>Employee</th><th>Department</th><th>Grade</th><th>Type</th><th>Status</th><th /></tr></thead>
-        <tbody>{list.map(t => <tr key={t.id}><td><div className="who"><Avatar name={t.name} /><div><b>{t.name}</b><small>{t.email}</small></div></div></td><td>{t.dept}</td><td>{t.grade}</td><td>{t.type}</td><td><Status value={t.status} /></td>
-          <td className="right"><button className="btn sm" onClick={() => { del('team', t.id); notify(t.name + ' removed'); }}><Icon name="trash" size={14} /></button></td></tr>)}</tbody></table>{!list.length && <Empty text="No matching employees." />}</div></Card>
+        <tbody>{list.map(t => <tr key={t.id} className="clickable" onClick={() => setWho(t)}><td><div className="who"><Avatar name={t.name} /><div><b>{t.name}</b><small>{t.email}</small></div></div></td><td>{t.dept}</td><td>{t.grade}</td><td>{t.type}</td><td><Status value={t.status} /></td>
+          <td className="right"><button className="btn sm" onClick={e => { e.stopPropagation(); del('team', t.id); notify(t.name + ' removed'); }}><Icon name="trash" size={14} /></button></td></tr>)}</tbody></table>{!list.length && <Empty text="No matching employees." />}</div></Card>
+      {who && <Profile person={who} onClose={() => setWho(null)} />}
       {open && <FormModal title="Onboard employee" submitLabel="Onboard" onClose={() => setOpen(false)}
-        fields={[{ name: 'name', label: 'Full name', required: true }, { name: 'title', label: 'Title', required: true }, { name: 'dept', label: 'Department', type: 'select', options: ['Engineering', 'Design', 'People', 'Sales', 'Analytics'] }, { name: 'email', label: 'Email', type: 'email', required: true }, { name: 'grade', label: 'Grade' }, { name: 'type', label: 'Type', type: 'select', options: ['Full-time', 'Contract'] }]}
+        fields={[{ name: 'name', label: 'Full name', required: true }, { name: 'title', label: 'Title', required: true }, { name: 'dept', label: 'Department', type: 'select', options: ['Engineering', 'Design', 'People', 'Sales', 'Analytics'] }, { name: 'email', label: 'Email', type: 'email', required: true }, { name: 'grade', label: 'Grade' }, { name: 'type', label: 'Type', type: 'select', options: ['Permanent', 'Contractual'] }]}
         onSubmit={v => { add('team', { ...v, rating: 0, status: 'Active' }); notify('Employee onboarded'); }} />}
     </div>
   );

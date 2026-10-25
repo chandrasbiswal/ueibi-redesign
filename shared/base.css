@@ -126,3 +126,20 @@ input[type=range] { width: 100%; accent-color: var(--pri); }
 .menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border: 0; background: transparent; border-radius: var(--radius-sm); text-align: left; } .menu button:hover, .menu button.on { background: var(--pri-soft); color: var(--pri); } .menu hr { border: 0; border-top: 1px solid var(--border); margin: 6px 0; } .menu .menu-t { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text3); padding: 6px 12px; font-weight: 650; }
 .page-actions { display: flex; gap: 10px; }
 @media print { .sidebar, .topbar, .rail, .toast { display: none !important; } }
+
+/* Goals, task board, filters, profile */
+.filters { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; } .fl { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text2); } .fl.row { flex-direction: row; align-items: center; gap: 8px; } .fl .input { min-width: 150px; }
+.avg { text-align: right; } .avg b { display: block; font-size: 30px; color: var(--pri); line-height: 1; } .avg small { font-size: 10.5px; letter-spacing: .08em; color: var(--text3); }
+.gcard { padding: 0; overflow: hidden; } .g-head { display: flex; align-items: center; gap: 16px; padding: 18px 20px; cursor: pointer; flex-wrap: wrap; } .g-head:hover { background: var(--surface2); }
+.gcard .chev { color: var(--text3); transition: transform .2s; } .gcard.open .chev { transform: rotate(180deg); }
+.g-ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--pri-soft); color: var(--pri); flex: none; }
+.g-main { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 6px; } .g-main h4 { font-size: 16px; font-weight: 650; }
+.g-meta { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; } .g-meta > div { display: flex; flex-direction: column; gap: 4px; } .g-meta small { font-size: 10.5px; letter-spacing: .06em; color: var(--text3); } .g-prog { min-width: 150px; }
+.g-act { display: flex; gap: 6px; align-items: center; } .g-body { border-top: 1px solid var(--border); padding: 16px 20px 20px; background: var(--surface2); }
+.g-body .tbl { background: var(--surface); border-radius: var(--radius-sm); }
+.kanban.k7 { grid-template-columns: repeat(7, minmax(250px, 1fr)); } .kdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+.kcard { border-left: 3px solid var(--border-strong, var(--border)); } .kcard.p-high, .kcard.p-critical { border-left-color: var(--bad); } .kcard.p-medium { border-left-color: var(--warn); } .glink { display: inline-flex; gap: 6px; align-items: center; font-size: 11.5px; color: var(--pri); background: var(--pri-soft); padding: 4px 8px; border-radius: 6px; }
+.tbl tr.clickable { cursor: pointer; }
+.who.big { display: flex; gap: 14px; align-items: center; }
+.g-head { flex-wrap: nowrap; gap: 18px; } .g-main { min-width: 0; } .g-meta { gap: 22px; flex-wrap: nowrap; } .g-meta > div { white-space: nowrap; } .g-prog .progress { min-width: 90px; flex: 1; }
+@media (max-width: 1500px) { .g-head { flex-wrap: wrap; } .g-meta { flex-wrap: wrap; } }
