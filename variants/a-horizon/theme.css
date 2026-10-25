@@ -1,0 +1,39 @@
+/* A · Horizon — light, classic left sidebar. Karyam blue + green. */
+:root, [data-theme=light] {
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bg: #f4f7fc; --surface: #ffffff; --surface2: #eef2f9; --border: #e3e9f3; --border-strong: #c9d3e4;
+  --text: #0b1437; --text2: #3e4a69; --text3: #7683a1;
+  --pri: #0b4fae; --pri-ink: #fff; --pri-soft: #e7effb;
+  --ok: #05916d; --ok-soft: #e2f6ef; --warn: #b7791f; --warn-soft: #fdf3df; --bad: #d03b3b; --bad-soft: #fdeaea; --info: #2563eb; --info-soft: #e8f0ff;
+  --radius: 14px; --radius-sm: 9px; --shadow: 0 1px 2px rgb(11 20 55 / .04), 0 4px 14px rgb(11 20 55 / .04);
+  --c1: #0b4fae; --c2: #05ad85; --c3: #7c5cf5; --c4: #f5a623;
+  --hero-bg: linear-gradient(120deg, #0a1b4d 0%, #0b4fae 62%, #05ad85 135%); --hero-ink: #fff;
+  --login-bg: radial-gradient(1000px 500px at 85% -10%, #dbe8ff, transparent), var(--bg);
+}
+[data-theme=dark] {
+  --bg: #0a1022; --surface: #111a33; --surface2: #17223f; --border: #1f2c4d; --border-strong: #33446e;
+  --text: #eaf0ff; --text2: #b3c0de; --text3: #7d8bad;
+  --pri: #5b95f5; --pri-ink: #06122e; --pri-soft: #17284d;
+  --ok: #34d3a4; --ok-soft: #0f2f2a; --warn: #f1b54b; --warn-soft: #33260f; --bad: #f47272; --bad-soft: #351919; --info: #6aa0ff; --info-soft: #14284f;
+  --shadow: none; --c1: #5b95f5; --c2: #34d3a4; --c3: #a58bff; --c4: #f1b54b;
+  --hero-bg: linear-gradient(120deg, #0d2a6b 0%, #1b4ea6 60%, #0b9275 135%);
+  --login-bg: radial-gradient(1000px 500px at 85% -10%, #14285a, transparent), var(--bg);
+}
+
+.shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar { position: sticky; top: 0; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 18px 14px; gap: 10px; }
+.sb-brand { display: flex; align-items: center; gap: 12px; padding: 4px 8px 16px; border-bottom: 1px solid var(--border); } .sb-brand b { font-size: 19px; letter-spacing: -.02em; display: block; line-height: 1.1; } .sb-brand small { text-transform: uppercase; letter-spacing: .08em; font-size: 10.5px; color: var(--pri); font-weight: 650; }
+[data-theme=dark] .brand-img:not(.full) { background-color: #fff; border-radius: 8px; padding: 0; }
+.sidebar nav { flex: 1; overflow-y: auto; padding-top: 6px; }
+.sb-group { margin-bottom: 14px; } .sb-title { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); font-weight: 650; padding: 8px 12px 6px; }
+.sidebar .nav-link { padding: 9px 12px; border-radius: 10px; color: var(--text2); font-weight: 520; margin-bottom: 2px; transition: .15s; position: relative; }
+.sidebar .nav-link:hover { background: var(--surface2); color: var(--text); }
+.sidebar .nav-link.active { background: var(--pri-soft); color: var(--pri); font-weight: 650; } .sidebar .nav-link.active::before { content: ''; position: absolute; left: -14px; top: 8px; bottom: 8px; width: 4px; border-radius: 0 4px 4px 0; background: var(--pri); }
+.sb-foot { border-top: 1px solid var(--border); padding-top: 12px; } .acct.block, .acct.block .acct-trigger { width: 100%; } .acct-trigger { border: 0; background: transparent; padding: 6px; border-radius: 12px; width: 100%; text-align: left; } .acct-trigger:hover { background: var(--surface2); } .acct-trigger .who { width: 100%; } .push { margin-left: auto; }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+.topbar { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 32px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+.topbar h1 { font-size: 21px; font-weight: 700; letter-spacing: -.02em; } .topbar p { color: var(--text3); font-size: 13px; }
+.tb-right { display: flex; align-items: center; gap: 8px; } .tb-right .search { min-width: 260px; } .bell { position: relative; } .bell i { position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--bad); border: 2px solid var(--bg); }
+.content { padding: 28px 32px 56px; max-width: 1480px; width: 100%; margin: 0 auto; }
+@media (max-width: 960px) { .shell { grid-template-columns: 76px 1fr; } .sb-brand > div, .sb-title, .sidebar .nav-link { font-size: 0; } .sidebar .nav-link { justify-content: center; } .sidebar .nav-link .ic { margin: 0; } .sb-foot .who span, .sb-foot .push { display: none; } .tb-right .search { display: none; } .content { padding: 20px 16px; } }

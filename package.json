@@ -1,0 +1,25 @@
+{
+  "name": "ueibi-ui-redesign",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  
+  "scripts": {
+    "dev:a": "vite --config variants/a-horizon/vite.config.js --port 5171",
+    "dev:b": "vite --config variants/b-meridian/vite.config.js --port 5172",
+    "dev:c": "vite --config variants/c-nocturne/vite.config.js --port 5173",
+    "build:a": "vite build --config variants/a-horizon/vite.config.js",
+    "build:b": "vite build --config variants/b-meridian/vite.config.js",
+    "build:c": "vite build --config variants/c-nocturne/vite.config.js",
+    "build": "npm run build:a && npm run build:b && npm run build:c"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
